@@ -28,6 +28,9 @@ ext {
     // Room
     roomVersion = '2.3.0'
     sqliteJdbc = '3.36.0.1'
+
+    // Testing
+    truthVersion = '1.0.1'
 }
 
 task clean(type: Delete) {
