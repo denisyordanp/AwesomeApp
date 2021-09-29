@@ -13,6 +13,11 @@ buildscript {
     }
 }
 
+ext {
+    gsonVersion = '2.9.0'
+    retrofitVersion = '2.9.0'
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
