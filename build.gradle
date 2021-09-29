@@ -14,8 +14,13 @@ buildscript {
 }
 
 ext {
+    // Retrofit
     gsonVersion = '2.9.0'
     retrofitVersion = '2.9.0'
+
+    // Room
+    roomVersion = '2.3.0'
+    sqliteJdbc = '3.36.0.1'
 }
 
 task clean(type: Delete) {
