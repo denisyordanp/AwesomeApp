@@ -1,9 +1,14 @@
 package com.okhome.awesomeapp.di
 
+import android.content.Context
+import androidx.room.Room
+import com.okhome.awesomeapp.data.database.PhotoDatabase
+import com.okhome.awesomeapp.utils.Constant
 import com.okhome.awesomeapp.utils.Constant.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -44,6 +49,14 @@ object BaseModule {
             .baseUrl(BASE_URL)
             .addConverterFactory(gsonConverterFactory)
             .client(okHttpClient)
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideAppDatabase(@ApplicationContext context: Context): PhotoDatabase {
+        return Room.databaseBuilder(context, PhotoDatabase::class.java, Constant.DATABASE_NAME)
+            .fallbackToDestructiveMigration()
             .build()
     }
 }
