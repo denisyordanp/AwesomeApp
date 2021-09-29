@@ -64,6 +64,7 @@ class PhotosRemoteMediatorTest {
 
     @Test
     fun refreshLoadSuccessAndEndOfPaginationWhenNoMoreData() = runBlocking {
+        mockService.shouldReturnData(false)
         val pagingState = PagingState<Int, PhotosEntity>(
             listOf(),
             null,
@@ -77,7 +78,7 @@ class PhotosRemoteMediatorTest {
 
     @Test
     fun refreshLoadReturnsErrorResultWhenErrorOccurs() = runBlocking {
-        // Set up failure message to throw exception from the mock API.
+        mockService.shouldReturnError(true)
         val pagingState = PagingState<Int, PhotosEntity>(
             listOf(),
             null,

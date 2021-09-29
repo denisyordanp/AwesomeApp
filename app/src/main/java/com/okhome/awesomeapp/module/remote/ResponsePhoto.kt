@@ -2,6 +2,7 @@ package com.okhome.awesomeapp.module.remote
 
 
 import com.google.gson.annotations.SerializedName
+import com.okhome.awesomeapp.module.database.PhotosEntity
 
 data class ResponsePhoto(
     @SerializedName("avg_color")
@@ -22,4 +23,16 @@ data class ResponsePhoto(
     val url: String,
     @SerializedName("width")
     val width: Int
-)
+) {
+
+    fun generatesToEntity(): PhotosEntity {
+        return PhotosEntity(
+            id = id,
+            avgColor = avgColor,
+            photographer = photographer,
+            photographerUrl = photographerUrl,
+            srcDefaultSize = sources.large,
+            srcLargeSize = sources.large2x
+        )
+    }
+}
