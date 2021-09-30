@@ -3,6 +3,7 @@ package com.okhome.awesomeapp.di
 import android.content.Context
 import androidx.room.Room
 import com.okhome.awesomeapp.data.database.PhotoDatabase
+import com.okhome.awesomeapp.data.remote.ApiService
 import com.okhome.awesomeapp.utils.Constant
 import com.okhome.awesomeapp.utils.Constant.BASE_URL
 import dagger.Module
@@ -50,6 +51,14 @@ object BaseModule {
             .addConverterFactory(gsonConverterFactory)
             .client(okHttpClient)
             .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideApiService(
+        retrofit: Retrofit
+    ): ApiService {
+        return retrofit.create(ApiService::class.java)
     }
 
     @Singleton
