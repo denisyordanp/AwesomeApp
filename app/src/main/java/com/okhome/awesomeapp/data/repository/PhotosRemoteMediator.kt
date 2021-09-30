@@ -35,17 +35,17 @@ class PhotosRemoteMediator(
                 // If current page is null, that means the refresh result is not in the database yet.
                 // We can return Success with `endOfPaginationReached = false` because Paging
                 // will call this method again if current page becomes non-null.
-                // If current page is NOT NULL but its prevKey is null, that means we've reached
+                // If current page is NOT NULL but its isPrevPageAvailable false, that means we've reached
                 // the end of pagination for prepend.
                 val prevPage = pageEntity?.currentPage?.minus(1)
                     ?: return MediatorResult.Success(endOfPaginationReached = pageEntity?.isPrevPageAvailable == false)
                 prevPage
             }
             LoadType.APPEND -> {
-                // If remoteKeys is null, that means the refresh result is not in the database yet.
+                // If current page is null, that means the refresh result is not in the database yet.
                 // We can return Success with endOfPaginationReached = false because Paging
                 // will call this method again if RemoteKeys becomes non-null.
-                // If remoteKeys is NOT NULL but its prevKey is null, that means we've reached
+                // If current page is NOT NULL but its isNextPageAvailable false, that means we've reached
                 // the end of pagination for append.
                 val nextPage = pageEntity?.currentPage?.plus(1)
                     ?: return MediatorResult.Success(endOfPaginationReached = pageEntity?.isNextPageAvailable == false)
