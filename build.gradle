@@ -22,6 +22,9 @@ ext {
     retrofitVersion = '2.9.0'
     loggingInterceptorVersion = '4.9.0'
 
+    // Navigation
+    navVersion = "2.3.5"
+
     // Paging
     pagingVersion = '3.0.0'
 
