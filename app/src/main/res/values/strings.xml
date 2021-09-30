@@ -2,4 +2,7 @@
     <string name="app_name">Awesome App</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="grid_view">Grid View</string>
+    <string name="list_view">List View</string>
+    <string name="background_photo">Background photo</string>
 </resources>

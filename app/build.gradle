@@ -24,6 +24,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    dataBinding {
+        enabled = true
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -61,6 +64,9 @@ dependencies {
     // Hilt
     implementation "com.google.dagger:hilt-android:$hiltVersion"
     kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
+
+    // Coil
+    implementation "io.coil-kt:coil:$coilVersion"
 
     // Local Test
     testImplementation 'junit:junit:4.+'
