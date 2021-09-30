@@ -15,6 +15,10 @@ class PhotosRepository @Inject constructor(
     private val service: ApiService
 ) {
 
+    suspend fun getPhotoById(id: Int): PhotosEntity? {
+        return database.photoDao().getPhotoById(id)
+    }
+
     fun getPhotosStream(): Flow<PagingData<Photo>> {
 
         val pagingSourceFactory = { database.photoDao().getPhotos() }

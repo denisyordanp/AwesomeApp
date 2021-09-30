@@ -22,5 +22,9 @@
         android:id="@+id/detailFragment"
         android:name="com.okhome.awesomeapp.views.DetailFragment"
         android:label="fragment_detail"
-        tools:layout="@layout/fragment_detail" />
+        tools:layout="@layout/fragment_detail" >
+        <argument
+            android:name="idPhoto"
+            app:argType="integer" />
+    </fragment>
 </navigation>
