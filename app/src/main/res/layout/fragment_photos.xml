@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="adapter"
             type="com.okhome.awesomeapp.views.PhotosAdapter" />
@@ -55,6 +57,7 @@
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/container_shimmer"
+                isShimmerLoading="@{viewModel.isLoading}"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:visibility="invisible">
@@ -68,10 +71,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:adapter="@{adapter}"
+                android:visibility="@{viewModel.isLoading ? View.INVISIBLE : View.VISIBLE}"
                 tools:listitem="@layout/photo_list_view_holder" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/container_error"
+                loadState="@{viewModel.loadState}"
+                stateAdapter="@{adapter}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center">
@@ -86,6 +92,7 @@
                     tools:text="@string/something_wrong" />
 
                 <Button
+                    android:id="@+id/try_again_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/try_again"

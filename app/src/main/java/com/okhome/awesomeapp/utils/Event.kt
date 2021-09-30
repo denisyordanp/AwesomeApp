@@ -1,5 +1,7 @@
 package com.okhome.awesomeapp.utils
 
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 
 /**
@@ -41,4 +43,16 @@ class EventObserver<T>(private val onEventUnhandledContent: (T) -> Unit) : Obser
             onEventUnhandledContent(it)
         }
     }
+}
+
+/**
+ * inline function for [LiveData.observe] [Event] to avoid boilerplate on calling [EventObserver]
+ */
+inline fun <T> LiveData<Event<T>>.observeEvent(
+    lifecycleOwner: LifecycleOwner,
+    crossinline function: (T) -> Unit
+) {
+    this.observe(lifecycleOwner, EventObserver {
+        function(it)
+    })
 }
