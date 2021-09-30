@@ -69,6 +69,9 @@ dependencies {
     // Coil
     implementation "io.coil-kt:coil:$coilVersion"
 
+    // Shimmer Effect
+    implementation "com.facebook.shimmer:shimmer:$shimmerVersion"
+
     // Local Test
     testImplementation 'junit:junit:4.+'
 

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.CombinedLoadStates
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -22,6 +23,9 @@ class PhotosViewModel
     private val _detailPhotoEvent = MutableLiveData<Event<Int>>()
     val detailPhotoEvent: LiveData<Event<Int>> = _detailPhotoEvent
 
+    private val _loadStateAdapter = MutableLiveData<CombinedLoadStates>()
+    val loadStateAdapter: LiveData<CombinedLoadStates> = _loadStateAdapter
+
     fun requestPhotos(): Flow<PagingData<Photo>> {
         return repository.getPhotosStream()
             .cachedIn(viewModelScope)
@@ -29,5 +33,9 @@ class PhotosViewModel
 
     fun navigateToDetailPhoto(id: Int) {
         _detailPhotoEvent.value = Event(id)
+    }
+
+    fun updateLoadState(loadState: CombinedLoadStates) {
+        _loadStateAdapter.value = loadState
     }
 }
