@@ -20,11 +20,11 @@
     </fragment>
     <fragment
         android:id="@+id/detailFragment"
-        android:name="com.okhome.awesomeapp.views.DetailFragment"
+        android:name="com.okhome.awesomeapp.views.detail.DetailFragment"
         android:label="fragment_detail"
         tools:layout="@layout/fragment_detail" >
         <argument
             android:name="idPhoto"
-            app:argType="integer" />
+            app:argType="long" />
     </fragment>
 </navigation>

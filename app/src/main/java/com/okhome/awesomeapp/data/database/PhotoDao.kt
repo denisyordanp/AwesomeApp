@@ -17,5 +17,5 @@ interface PhotoDao {
     fun getPhotos(): PagingSource<Int, PhotosEntity>
 
     @Query("SELECT * FROM ${PhotosEntity.TABLE_NAME} WHERE id = :id")
-    suspend fun getPhotoById(id: Int): PhotosEntity?
+    suspend fun getPhotoById(id: Long): PhotosEntity?
 }

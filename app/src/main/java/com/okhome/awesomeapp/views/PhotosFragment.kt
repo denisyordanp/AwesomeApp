@@ -71,7 +71,7 @@ class PhotosFragment : Fragment() {
     }
 
     private fun toDetailPhoto(id: Int) {
-        val action = PhotosFragmentDirections.actionPhotosFragmentToDetailFragment(id)
+        val action = PhotosFragmentDirections.actionPhotosFragmentToDetailFragment(id.toLong())
         findNavController().navigate(action)
     }
 

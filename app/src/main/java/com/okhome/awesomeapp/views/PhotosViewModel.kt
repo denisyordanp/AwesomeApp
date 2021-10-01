@@ -4,10 +4,12 @@ import androidx.lifecycle.*
 import androidx.paging.*
 import com.okhome.awesomeapp.data.repository.PhotosRepository
 import com.okhome.awesomeapp.module.local.Photo
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @ExperimentalPagingApi
+@HiltViewModel
 class PhotosViewModel
 @Inject constructor(
     private val repository: PhotosRepository

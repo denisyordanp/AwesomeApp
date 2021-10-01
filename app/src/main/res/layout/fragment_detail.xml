@@ -6,18 +6,18 @@
     <data>
 
         <variable
-            name="photo"
-            type="com.okhome.awesomeapp.module.local.Photo" />
+            name="viewModel"
+            type="com.okhome.awesomeapp.views.detail.DetailViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".views.DetailFragment">
+        tools:context=".views.detail.DetailFragment">
 
         <ImageView
             android:id="@+id/detail_image"
-            loadImage="@{photo.srcLargeSize}"
+            loadImage="@{viewModel.currentPhoto.srcLargeSize}"
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:contentDescription="@string/background_photo"
@@ -41,7 +41,7 @@
                 android:id="@+id/tv_detail_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="@{photo.photographer}"
+                android:text="@{viewModel.currentPhoto.photographer}"
                 tools:text="@string/lorem" />
 
         </androidx.core.widget.NestedScrollView>
