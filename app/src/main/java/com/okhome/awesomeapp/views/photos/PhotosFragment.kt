@@ -9,13 +9,17 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.okhome.awesomeapp.databinding.FragmentPhotosBinding
 import com.okhome.awesomeapp.views.photos.adapters.PhotosAdapter
 import com.okhome.awesomeapp.views.photos.adapters.PhotosLoadStateAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @ExperimentalPagingApi
@@ -27,12 +31,15 @@ class PhotosFragment : Fragment() {
     private val photoAdapter: PhotosAdapter = PhotosAdapter()
 
     private var loadJob: Job? = null
+    private var isBack = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        isBack = true
         if (binding == null) {
+            isBack = false
             binding = FragmentPhotosBinding.inflate(inflater, container, false).setupBindings()
         }
         return binding!!.root
@@ -51,8 +58,9 @@ class PhotosFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupAdapter()
         setupListener()
-        loadPhotos()
+        if (!isBack) loadPhotos()
     }
+
 
     private fun setupAdapter() {
         binding?.run {
@@ -87,6 +95,14 @@ class PhotosFragment : Fragment() {
             photosViewModel.requestPhotos().collectLatest {
                 photoAdapter.submitData(it)
             }
+        }
+
+        // Scroll to top when the list is refreshed from network.
+        lifecycleScope.launch {
+            photoAdapter.loadStateFlow
+                .distinctUntilChangedBy { it.refresh }
+                .filter { it.refresh is LoadState.NotLoading }
+                .collect { binding?.recyclerView?.scrollToPosition(0) }
         }
     }
 }
