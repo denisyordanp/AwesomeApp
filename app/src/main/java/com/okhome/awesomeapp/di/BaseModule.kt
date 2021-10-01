@@ -2,6 +2,7 @@ package com.okhome.awesomeapp.di
 
 import android.content.Context
 import androidx.room.Room
+import com.okhome.awesomeapp.BuildConfig
 import com.okhome.awesomeapp.data.database.PhotoDatabase
 import com.okhome.awesomeapp.data.remote.ApiService
 import com.okhome.awesomeapp.utils.Constant
@@ -11,6 +12,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -25,13 +27,24 @@ object BaseModule {
     @Singleton
     @Provides
     fun provideHttpClient(): OkHttpClient {
-        val logging = HttpLoggingInterceptor()
-        logging.level = HttpLoggingInterceptor.Level.BODY
         return OkHttpClient.Builder()
             .addInterceptor(logging)
+            .addInterceptor(header)
             .readTimeout(15, TimeUnit.SECONDS)
             .connectTimeout(15, TimeUnit.SECONDS)
             .build()
+    }
+
+    private val logging = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+
+    private val header = Interceptor { chain ->
+        val newRequest = chain.request().newBuilder()
+            .addHeader("Authorization", BuildConfig.API_KEY)
+            .build()
+
+        return@Interceptor chain.proceed(newRequest)
     }
 
     @Singleton
