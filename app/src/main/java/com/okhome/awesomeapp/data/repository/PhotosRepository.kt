@@ -15,7 +15,7 @@ class PhotosRepository @Inject constructor(
     private val service: ApiService
 ) {
 
-    suspend fun getPhotoById(id: Int): PhotosEntity? {
+    suspend fun getPhotoById(id: Long): PhotosEntity? {
         return database.photoDao().getPhotoById(id)
     }
 
