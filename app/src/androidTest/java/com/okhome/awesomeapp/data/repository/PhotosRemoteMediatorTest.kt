@@ -50,20 +50,6 @@ class PhotosRemoteMediatorTest {
     }
 
     @Test
-    fun currentPageReturnNotNullAnd1WhenFirstLoadData() = runBlocking {
-        val pagingState = PagingState<Int, PhotosEntity>(
-            listOf(),
-            null,
-            PagingConfig(10),
-            10
-        )
-        mediator.load(LoadType.REFRESH, pagingState)
-        val currentPage = database.remoteKeysDao().getCurrentPage()
-        assertThat(currentPage).isNotNull()
-        assertThat(currentPage?.currentPage).isEqualTo(1)
-    }
-
-    @Test
     fun refreshLoadReturnsSuccessResultWhenMoreDataIsPresent() = runBlocking {
         val pagingState = PagingState<Int, PhotosEntity>(
             listOf(),

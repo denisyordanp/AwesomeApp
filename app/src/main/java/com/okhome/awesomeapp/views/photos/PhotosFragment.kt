@@ -9,17 +9,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.ExperimentalPagingApi
-import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.okhome.awesomeapp.databinding.FragmentPhotosBinding
 import com.okhome.awesomeapp.views.photos.adapters.PhotosAdapter
 import com.okhome.awesomeapp.views.photos.adapters.PhotosLoadStateAdapter
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @ExperimentalPagingApi
@@ -30,7 +25,6 @@ class PhotosFragment : Fragment() {
     private val photosViewModel by viewModels<PhotosViewModel>()
     private val photoAdapter: PhotosAdapter = PhotosAdapter()
 
-    private var loadJob: Job? = null
     private var isBack = true
 
     override fun onCreateView(
@@ -61,13 +55,11 @@ class PhotosFragment : Fragment() {
         if (!isBack) loadPhotos()
     }
 
-
     private fun setupAdapter() {
         binding?.run {
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
-            recyclerView.adapter = photoAdapter.withLoadStateHeaderAndFooter(
-                header = PhotosLoadStateAdapter { photoAdapter.retry() },
-                footer = PhotosLoadStateAdapter { photoAdapter.retry() }
+            recyclerView.adapter = photoAdapter.withLoadStateFooter(
+                PhotosLoadStateAdapter { photoAdapter.retry() }
             )
             photoAdapter.addLoadStateListener {
                 photosViewModel.updateLoadState(it)
@@ -90,19 +82,11 @@ class PhotosFragment : Fragment() {
     }
 
     private fun loadPhotos() {
-        loadJob?.cancel()
-        loadJob = lifecycleScope.launch {
-            photosViewModel.requestPhotos().collectLatest {
-                photoAdapter.submitData(it)
-            }
-        }
-
-        // Scroll to top when the list is refreshed from network.
         lifecycleScope.launch {
-            photoAdapter.loadStateFlow
-                .distinctUntilChangedBy { it.refresh }
-                .filter { it.refresh is LoadState.NotLoading }
-                .collect { binding?.recyclerView?.scrollToPosition(0) }
+            photosViewModel.requestPhotos()
+                .collectLatest {
+                    photoAdapter.submitData(it)
+                }
         }
     }
 }

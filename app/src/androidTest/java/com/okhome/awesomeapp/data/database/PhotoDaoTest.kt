@@ -39,7 +39,7 @@ class PhotoDaoTest {
 
     @Test
     fun getPhotoByIdReturnPhotoEntity() = runBlocking {
-        val photo = PhotosEntity(1, "", "", "", "", "")
+        val photo = PhotosEntity(1, "", "", "", "", "", null, null)
         photoDao.insertPhotos(listOf(photo))
 
         val photoEntity = photoDao.getPhotoById(1)

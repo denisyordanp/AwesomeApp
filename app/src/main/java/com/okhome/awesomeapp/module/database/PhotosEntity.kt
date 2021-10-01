@@ -12,7 +12,9 @@ data class PhotosEntity(
     val photographer: String,
     val photographerUrl: String,
     val srcDefaultSize: String,
-    val srcLargeSize: String
+    val srcLargeSize: String,
+    val prevKey: Int?,
+    val nextKey: Int?
 ) {
     companion object {
         const val TABLE_NAME = "photos"

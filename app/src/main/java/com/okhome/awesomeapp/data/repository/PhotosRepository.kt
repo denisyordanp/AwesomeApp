@@ -25,7 +25,7 @@ class PhotosRepository @Inject constructor(
 
         return Pager(
             config = PagingConfig(
-                pageSize = NETWORK_PAGE_SIZE,
+                pageSize = PAGE_SIZE,
                 enablePlaceholders = false
             ),
             remoteMediator = PhotosRemoteMediator(
@@ -45,6 +45,6 @@ class PhotosRepository @Inject constructor(
     }
 
     companion object {
-        const val NETWORK_PAGE_SIZE = 30
+        const val PAGE_SIZE = 30
     }
 }

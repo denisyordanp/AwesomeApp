@@ -13,7 +13,7 @@ interface PhotoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPhotos(list: List<PhotosEntity>)
 
-    @Query("SELECT * FROM ${PhotosEntity.TABLE_NAME}")
+    @Query("SELECT * FROM ${PhotosEntity.TABLE_NAME} ORDER BY nextKey ASC")
     fun getPhotos(): PagingSource<Int, PhotosEntity>
 
     @Query("SELECT * FROM ${PhotosEntity.TABLE_NAME} WHERE id = :id")

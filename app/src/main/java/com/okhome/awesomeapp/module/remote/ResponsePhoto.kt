@@ -25,14 +25,16 @@ data class ResponsePhoto(
     val width: Int
 ) {
 
-    fun generatesToEntity(): PhotosEntity {
+    fun generatesToEntity(dataPrevKey: Int?, dataNextKey: Int?): PhotosEntity {
         return PhotosEntity(
             id = id,
             avgColor = avgColor,
             photographer = photographer,
             photographerUrl = photographerUrl,
             srcDefaultSize = sources.large,
-            srcLargeSize = sources.large2x
+            srcLargeSize = sources.large2x,
+            prevKey = dataPrevKey,
+            nextKey = dataNextKey
         )
     }
 }
