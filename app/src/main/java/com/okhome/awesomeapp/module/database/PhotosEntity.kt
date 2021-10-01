@@ -7,7 +7,7 @@ import com.okhome.awesomeapp.module.local.Photo
 @Entity(tableName = PhotosEntity.TABLE_NAME)
 data class PhotosEntity(
     @PrimaryKey
-    val id: Int,
+    val id: Long,
     val avgColor: String,
     val photographer: String,
     val photographerUrl: String,

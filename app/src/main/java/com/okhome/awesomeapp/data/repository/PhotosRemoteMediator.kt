@@ -1,5 +1,6 @@
 package com.okhome.awesomeapp.data.repository
 
+import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -7,11 +8,13 @@ import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.okhome.awesomeapp.data.database.PhotoDatabase
 import com.okhome.awesomeapp.data.remote.ApiService
-import com.okhome.awesomeapp.module.database.PageEntity
 import com.okhome.awesomeapp.module.database.PhotosEntity
+import com.okhome.awesomeapp.module.database.RemoteKeysEntity
 import com.okhome.awesomeapp.module.remote.ResponsePhoto
+import com.okhome.awesomeapp.module.remote.Sources
 import retrofit2.HttpException
 import java.io.IOException
+import java.util.*
 
 private const val PEXELS_STARTING_PAGE_INDEX = 1
 
@@ -20,36 +23,47 @@ class PhotosRemoteMediator(
     private val service: ApiService,
     private val database: PhotoDatabase
 ) : RemoteMediator<Int, PhotosEntity>() {
+
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, PhotosEntity>
     ): MediatorResult {
-
-        val pageEntity = database.pageDao().getCurrentPage()
         val page = when (loadType) {
             LoadType.REFRESH -> {
-                // if current page is null then load default starting page
-                pageEntity?.currentPage ?: PEXELS_STARTING_PAGE_INDEX
+                Log.d("DEBUGING", "refresh")
+                val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
+                remoteKeys?.nextKey?.minus(1) ?: PEXELS_STARTING_PAGE_INDEX
+
             }
             LoadType.PREPEND -> {
-                // If current page is null, that means the refresh result is not in the database yet.
+                Log.d("DEBUGING", "prepend")
+                val remoteKeys = getRemoteKeyForFirstItem(state)
+                // If remoteKeys is null, that means the refresh result is not in the database yet.
                 // We can return Success with `endOfPaginationReached = false` because Paging
-                // will call this method again if current page becomes non-null.
-                // If current page is NOT NULL but its isPrevPageAvailable false, that means we've reached
+                // will call this method again if RemoteKeys becomes non-null.
+                // If remoteKeys is NOT NULL but its prevKey is null, that means we've reached
                 // the end of pagination for prepend.
-                val prevPage = pageEntity?.currentPage?.minus(1)
-                    ?: return MediatorResult.Success(endOfPaginationReached = pageEntity?.isPrevPageAvailable == false)
-                prevPage
+                val prevKey = remoteKeys?.prevKey
+                if (prevKey == null) {
+                    Log.d("DEBUGING", "prevKey null")
+                    return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
+                }
+                prevKey
             }
             LoadType.APPEND -> {
-                // If current page is null, that means the refresh result is not in the database yet.
+                Log.d("DEBUGING", "append")
+                val remoteKeys = getRemoteKeyForLastItem(state)
+                // If remoteKeys is null, that means the refresh result is not in the database yet.
                 // We can return Success with endOfPaginationReached = false because Paging
                 // will call this method again if RemoteKeys becomes non-null.
-                // If current page is NOT NULL but its isNextPageAvailable false, that means we've reached
+                // If remoteKeys is NOT NULL but its prevKey is null, that means we've reached
                 // the end of pagination for append.
-                val nextPage = pageEntity?.currentPage?.plus(1)
-                    ?: return MediatorResult.Success(endOfPaginationReached = pageEntity?.isNextPageAvailable == false)
-                nextPage
+                val nextKeys = remoteKeys?.nextKey
+                if (nextKeys == null) {
+                    Log.d("DEBUGING", "nextKey null")
+                    return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
+                }
+                nextKeys
             }
         }
 
@@ -57,16 +71,28 @@ class PhotosRemoteMediator(
             val apiResponse = service.requestPhotos(page, state.config.pageSize)
 
             val photos = apiResponse.photos
+
+            Log.d("DEBUGING", "page $page")
+//            val photos = mockData()
             val endOfPaginationReached = photos.isEmpty()
 
             database.withTransaction {
 
-                val currentPage = PageEntity(
-                    isPrevPageAvailable = page != PEXELS_STARTING_PAGE_INDEX,
-                    currentPage = page,
-                    isNextPageAvailable = !endOfPaginationReached
-                )
-                database.pageDao().insertCurrentPage(currentPage)
+                // clear all tables in the database
+                if (loadType == LoadType.REFRESH) {
+                    database.remoteKeysDao().clearRemoteKeys()
+                    database.photoDao().clearPhotos()
+                }
+
+                val prevKey = if (page == PEXELS_STARTING_PAGE_INDEX) null else page - 1
+                val nextKey = if (endOfPaginationReached) null else page + 1
+                val keys = photos.map {
+                    RemoteKeysEntity(
+                        photoId = it.id,
+                        prevKey, nextKey
+                    )
+                }
+                database.remoteKeysDao().insertAll(keys)
                 database.photoDao().insertPhotos(photos.generatesPhotosEntity())
             }
 
@@ -78,7 +104,59 @@ class PhotosRemoteMediator(
         }
     }
 
+    private val mockSource = Sources("", "", "", "", "", "", "", "")
+    private fun mockData(): List<ResponsePhoto> {
+        val list: MutableList<ResponsePhoto> = mutableListOf()
+        repeat(30) {
+            list.add(ResponsePhoto(
+                "",
+                1,
+                (1L..9999L).random(),
+                "",
+                1,
+                "",
+                mockSource,
+                "",
+                1
+            ))
+        }
+        return list
+    }
+
     private fun List<ResponsePhoto>.generatesPhotosEntity(): List<PhotosEntity> {
         return this.map { it.generatesToEntity() }
+    }
+
+    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, PhotosEntity>): RemoteKeysEntity? {
+        // Get the last page that was retrieved, that contained items.
+        // From that last page, get the last item
+        return state.pages.lastOrNull {
+            it.data.isNotEmpty()
+        }?.data?.lastOrNull()?.let { photo ->
+            // Get the remote keys of the last item retrieved
+            database.remoteKeysDao().remoteKeysId(photo.id)
+        }
+    }
+
+    private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, PhotosEntity>): RemoteKeysEntity? {
+        // Get the first page that was retrieved, that contained items.
+        // From that first page, get the first item
+        return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
+            ?.let { photo ->
+                // Get the remote keys of the first items retrieved
+                database.remoteKeysDao().remoteKeysId(photo.id)
+            }
+    }
+
+    private suspend fun getRemoteKeyClosestToCurrentPosition(
+        state: PagingState<Int, PhotosEntity>
+    ): RemoteKeysEntity? {
+        // The paging library is trying to load data after the anchor position
+        // Get the item closest to the anchor position
+        return state.anchorPosition?.let { position ->
+            state.closestItemToPosition(position)?.id?.let { photoId ->
+                database.remoteKeysDao().remoteKeysId(photoId)
+            }
+        }
     }
 }

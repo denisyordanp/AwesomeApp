@@ -1,4 +1,4 @@
-package com.okhome.awesomeapp.views
+package com.okhome.awesomeapp.views.photos.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -26,7 +26,7 @@ class PhotosAdapter : PagingDataAdapter<Photo, PhotosAdapter.PhotoViewHolder>(PH
         }
     }
 
-    var onClick: ((Int) -> Unit)? = null
+    var onClick: ((Long) -> Unit)? = null
     var showViewType: ViewType = DEFAULT_VIEW_TYPE
 
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
@@ -42,7 +42,7 @@ class PhotosAdapter : PagingDataAdapter<Photo, PhotosAdapter.PhotoViewHolder>(PH
     }
 
     abstract class PhotoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        abstract fun bind(dataPhoto: Photo?, onClick: ((Int) -> Unit)?)
+        abstract fun bind(dataPhoto: Photo?, onClick: ((Long) -> Unit)?)
     }
 
     class PhotoGridViewHolder(private val binding: PhotoGridViewHolderBinding) :
@@ -56,7 +56,7 @@ class PhotosAdapter : PagingDataAdapter<Photo, PhotosAdapter.PhotoViewHolder>(PH
             }
         }
 
-        override fun bind(dataPhoto: Photo?, onClick: ((Int) -> Unit)?) {
+        override fun bind(dataPhoto: Photo?, onClick: ((Long) -> Unit)?) {
             dataPhoto?.let {
                 binding.apply {
                     photo = it
@@ -80,7 +80,7 @@ class PhotosAdapter : PagingDataAdapter<Photo, PhotosAdapter.PhotoViewHolder>(PH
             }
         }
 
-        override fun bind(dataPhoto: Photo?, onClick: ((Int) -> Unit)?) {
+        override fun bind(dataPhoto: Photo?, onClick: ((Long) -> Unit)?) {
             dataPhoto?.let {
                 binding.apply {
                     photo = it

@@ -58,7 +58,7 @@ class PhotosRemoteMediatorTest {
             10
         )
         mediator.load(LoadType.REFRESH, pagingState)
-        val currentPage = database.pageDao().getCurrentPage()
+        val currentPage = database.remoteKeysDao().getCurrentPage()
         assertThat(currentPage).isNotNull()
         assertThat(currentPage?.currentPage).isEqualTo(1)
     }

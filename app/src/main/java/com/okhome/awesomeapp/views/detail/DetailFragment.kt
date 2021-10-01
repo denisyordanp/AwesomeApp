@@ -1,4 +1,4 @@
-package com.okhome.awesomeapp.views
+package com.okhome.awesomeapp.views.detail
 
 import android.os.Bundle
 import android.view.LayoutInflater

@@ -8,10 +8,11 @@ import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
-import androidx.paging.LoadStates
+import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.okhome.awesomeapp.R
+import com.okhome.awesomeapp.views.photos.adapters.PhotosAdapter
 
 object BindingAdapters {
 
@@ -32,11 +33,21 @@ object BindingAdapters {
 
     @JvmStatic
     @BindingAdapter("isShimmerLoading")
-    fun setupShimmerLoading(view: ShimmerFrameLayout, isLoading: Boolean) {
-        if (isLoading)
+    fun setupShimmerLoading(view: ShimmerFrameLayout, state: CombinedLoadStates) {
+        val isLoading = state.refresh is LoadState.Loading
+        view.isVisible = isLoading
+        if (isLoading) {
             view.startShimmer()
-        else
-            view.stopShimmer()
+        } else {
+            view.hideShimmer()
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter("setContentVisibility")
+    fun setupContent(view: RecyclerView, state: CombinedLoadStates) {
+        val isVisible = state.mediator?.refresh is LoadState.NotLoading
+        view.isVisible = isVisible
     }
 
     @JvmStatic
@@ -50,7 +61,7 @@ object BindingAdapters {
                 errorText.text = view.context.getString(R.string.data_not_found)
                 view.isVisible = true
             }
-            state.refresh is LoadState.Error -> {
+            state.mediator?.refresh is LoadState.Error -> {
                 errorText.text = view.context.getString(R.string.something_wrong)
                 view.isVisible = true
             }

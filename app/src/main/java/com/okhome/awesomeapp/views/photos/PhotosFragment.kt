@@ -1,4 +1,4 @@
-package com.okhome.awesomeapp.views
+package com.okhome.awesomeapp.views.photos
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,8 +9,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.ExperimentalPagingApi
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.okhome.awesomeapp.databinding.FragmentPhotosBinding
-import com.okhome.awesomeapp.utils.PhotosLoadStateAdapter
+import com.okhome.awesomeapp.views.photos.adapters.PhotosAdapter
+import com.okhome.awesomeapp.views.photos.adapters.PhotosLoadStateAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -20,9 +22,9 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class PhotosFragment : Fragment() {
 
-    private lateinit var binding: FragmentPhotosBinding
+    private var binding: FragmentPhotosBinding? = null
     private val photosViewModel by viewModels<PhotosViewModel>()
-    private lateinit var photoAdapter: PhotosAdapter
+    private val photoAdapter: PhotosAdapter = PhotosAdapter()
 
     private var loadJob: Job? = null
 
@@ -30,8 +32,10 @@ class PhotosFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPhotosBinding.inflate(inflater, container, false).setupBindings()
-        return binding.root
+        if (binding == null) {
+            binding = FragmentPhotosBinding.inflate(inflater, container, false).setupBindings()
+        }
+        return binding!!.root
     }
 
     private fun FragmentPhotosBinding.setupBindings(): FragmentPhotosBinding {
@@ -39,38 +43,40 @@ class PhotosFragment : Fragment() {
             viewModel = photosViewModel
             lifecycleOwner = viewLifecycleOwner
 
-            setupAdapter()
             adapter = photoAdapter
-        }
-    }
-
-    private fun setupAdapter() {
-        val loadState = PhotosLoadStateAdapter { photoAdapter.retry() }
-        photoAdapter.withLoadStateHeaderAndFooter(
-            header = loadState,
-            footer = loadState
-        )
-        photoAdapter.addLoadStateListener {
-            photosViewModel.updateLoadState(it)
-        }
-        photoAdapter.onClick = {
-            toDetailPhoto(id)
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupAdapter()
         setupListener()
         loadPhotos()
     }
 
+    private fun setupAdapter() {
+        binding?.run {
+            recyclerView.layoutManager = LinearLayoutManager(requireContext())
+            recyclerView.adapter = photoAdapter.withLoadStateHeaderAndFooter(
+                header = PhotosLoadStateAdapter { photoAdapter.retry() },
+                footer = PhotosLoadStateAdapter { photoAdapter.retry() }
+            )
+            photoAdapter.addLoadStateListener {
+                photosViewModel.updateLoadState(it)
+            }
+            photoAdapter.onClick = {
+                toDetailPhoto(it)
+            }
+        }
+    }
+
     private fun setupListener() {
-        binding.tryAgainButton.setOnClickListener {
+        binding?.tryAgainButton?.setOnClickListener {
             photoAdapter.retry()
         }
     }
 
-    private fun toDetailPhoto(id: Int) {
+    private fun toDetailPhoto(id: Long) {
         val action = PhotosFragmentDirections.actionPhotosFragmentToDetailFragment(id)
         findNavController().navigate(action)
     }

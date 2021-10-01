@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.okhome.awesomeapp.module.database.PhotosEntity
+import com.okhome.awesomeapp.module.database.RemoteKeysEntity
 
 @Dao
 interface PhotoDao {
@@ -18,4 +19,7 @@ interface PhotoDao {
 
     @Query("SELECT * FROM ${PhotosEntity.TABLE_NAME} WHERE id = :id")
     suspend fun getPhotoById(id: Int): PhotosEntity?
+
+    @Query("DELETE FROM ${PhotosEntity.TABLE_NAME}")
+    suspend fun clearPhotos()
 }

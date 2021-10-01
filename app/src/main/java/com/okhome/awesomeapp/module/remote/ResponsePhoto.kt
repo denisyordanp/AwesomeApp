@@ -10,7 +10,7 @@ data class ResponsePhoto(
     @SerializedName("height")
     val height: Int,
     @SerializedName("id")
-    val id: Int,
+    val id: Long,
     @SerializedName("photographer")
     val photographer: String,
     @SerializedName("photographer_id")
