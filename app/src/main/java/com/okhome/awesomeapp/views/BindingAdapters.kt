@@ -1,5 +1,6 @@
 package com.okhome.awesomeapp.views
 
+import android.graphics.Color
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -11,6 +12,7 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.facebook.shimmer.ShimmerFrameLayout
+import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.okhome.awesomeapp.R
 import com.okhome.awesomeapp.views.photos.adapters.PhotosAdapter
 
@@ -69,5 +71,23 @@ object BindingAdapters {
                 view.isVisible = false
             }
         }
+    }
+
+    @JvmStatic
+    @BindingAdapter("setContrastTitle")
+    fun setupTitleColor(view: CollapsingToolbarLayout, avgColor: String?) {
+        try {
+            avgColor?.let { view.setExpandedTitleColor(getContrastColor(it)) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun getContrastColor(color: String): Int {
+        val r = color.substring(0, 2).toInt(16) // 16 for hex
+        val g = color.substring(2, 4).toInt(16) // 16 for hex
+        val b = color.substring(4, 6).toInt(16) // 16 for hex
+        val yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        return if (yiq >= 128) Color.BLACK else Color.WHITE
     }
 }

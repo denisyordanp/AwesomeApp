@@ -2,6 +2,7 @@ package com.okhome.awesomeapp.views.photos
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -57,9 +58,16 @@ class PhotosFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupToolBar()
         setupAdapter()
         setupListener()
         if (!isBack) loadPhotos()
+    }
+
+    private fun setupToolBar() {
+        binding?.run {
+            (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

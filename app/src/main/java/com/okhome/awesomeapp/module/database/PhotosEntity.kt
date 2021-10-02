@@ -22,7 +22,11 @@ data class PhotosEntity(
 
     fun generateToLocal(): Photo {
         return Photo(
-            id, avgColor, photographer, photographerUrl, srcDefaultSize, srcLargeSize
+            id, avgColor.toHex(), photographer, photographerUrl, srcDefaultSize, srcLargeSize
         )
+    }
+
+    private fun String.toHex(): String {
+        return this.removePrefix("#")
     }
 }
